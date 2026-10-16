@@ -1,0 +1,65 @@
+<Window x:Class="WidgetWindowDemo.WidgetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Width="320" Height="180"
+        MinWidth="100" MinHeight="80">
+
+    <!-- ResizeMode=NoResize: sin marco de Windows, sin grip y sin Aero Snap.
+         Mover y redimensionar se hacen manualmente (ver code-behind).
+         La capa (Siempre visible / Integrado en el escritorio) la aplica ApplyLayer(). -->
+    <Window.Resources>
+        <Style x:Key="EdgeHandle" TargetType="Border">
+            <Setter Property="Background" Value="#336C63FF" />
+        </Style>
+        <Style x:Key="CornerHandle" TargetType="Border">
+            <Setter Property="Width" Value="14" />
+            <Setter Property="Height" Value="14" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#6C63FF" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="3" />
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="Root" Background="Transparent" Tag="M">
+        <Image x:Name="ImageViewer" Stretch="Uniform" Visibility="Collapsed" />
+        <MediaElement x:Name="VideoViewer"
+                      LoadedBehavior="Manual"
+                      UnloadedBehavior="Manual"
+                      IsMuted="True"
+                      Stretch="Uniform"
+                      Visibility="Collapsed"
+                      MediaEnded="VideoViewer_MediaEnded" />
+
+        <!-- Solo visible en modo edición (mover y redimensionar) -->
+        <Grid x:Name="ResizeOverlay" Visibility="Collapsed">
+            <Rectangle Stroke="#6C63FF" StrokeThickness="2" StrokeDashArray="4 3"
+                       Margin="1" IsHitTestVisible="False" />
+
+            <Border Background="#E61A1A26" CornerRadius="6" Padding="10,4"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                <TextBlock Foreground="White" FontFamily="Segoe UI" FontSize="11" TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           Text="Arrastra para mover · Doble clic para terminar" />
+            </Border>
+
+            <!-- Lados -->
+            <Border Tag="L" Style="{StaticResource EdgeHandle}" HorizontalAlignment="Left"  Width="8"  Margin="0,14" Cursor="SizeWE" />
+            <Border Tag="R" Style="{StaticResource EdgeHandle}" HorizontalAlignment="Right" Width="8"  Margin="0,14" Cursor="SizeWE" />
+            <Border Tag="T" Style="{StaticResource EdgeHandle}" VerticalAlignment="Top"     Height="8" Margin="14,0" Cursor="SizeNS" />
+            <Border Tag="B" Style="{StaticResource EdgeHandle}" VerticalAlignment="Bottom"  Height="8" Margin="14,0" Cursor="SizeNS" />
+
+            <!-- Esquinas -->
+            <Border Tag="TL" Style="{StaticResource CornerHandle}" HorizontalAlignment="Left"  VerticalAlignment="Top"    Cursor="SizeNWSE" />
+            <Border Tag="TR" Style="{StaticResource CornerHandle}" HorizontalAlignment="Right" VerticalAlignment="Top"    Cursor="SizeNESW" />
+            <Border Tag="BL" Style="{StaticResource CornerHandle}" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Cursor="SizeNESW" />
+            <Border Tag="BR" Style="{StaticResource CornerHandle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" />
+        </Grid>
+    </Grid>
+</Window>

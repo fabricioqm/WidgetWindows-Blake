@@ -1,0 +1,64 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <!--
+    MSI installer for Widget Manager (WiX Toolset 5, free and open source).
+
+    Self-sufficient: building this project first publishes the app (self-contained, so the target PC needs no
+    .NET installed), reads the version from WidgetWindowDemo.csproj and then builds the MSI.
+
+        dotnet build Installer\WidgetManager.Installer.wixproj -c Release
+        dotnet build Installer\WidgetManager.Installer.wixproj -c Release -p:InstallerPlatform=arm64
+
+    Output: artifacts\WidgetManager-<version>-<platform>.msi
+  -->
+  <PropertyGroup>
+    <InstallerPlatform Condition="'$(InstallerPlatform)' == ''">x64</InstallerPlatform>
+    <Manufacturer Condition="'$(Manufacturer)' == ''">fabricioqm</Manufacturer>
+    <AppProject>$(MSBuildThisFileDirectory)..\WidgetWindowDemo\WidgetWindowDemo.csproj</AppProject>
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\artifacts\publish\win-$(InstallerPlatform)\</PublishDir>
+    <Cultures>es-ES</Cultures>
+    <OutputName>WidgetManager-$(InstallerPlatform)</OutputName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+  </ItemGroup>
+
+  <!-- 1. Version from the app project (single source of truth: <Version> in WidgetWindowDemo.csproj). -->
+  <Target Name="ReadAppVersion" Condition="'$(ProductVersion)' == ''">
+    <XmlPeek XmlInputPath="$(AppProject)" Query="/Project/PropertyGroup/Version/text()">
+      <Output TaskParameter="Result" PropertyName="ProductVersion" />
+    </XmlPeek>
+    <Error Condition="'$(ProductVersion)' == ''" Text="No se encontró &lt;Version&gt; en $(AppProject)." />
+  </Target>
+
+  <!-- 2. Publish the app self-contained (the .NET 10 runtime and WPF go inside the installer).
+          -p:SkipAppPublish=true reuses an existing publish folder. -->
+  <Target Name="PublishApp" DependsOnTargets="ReadAppVersion" Condition="'$(SkipAppPublish)' != 'true'">
+    <PropertyGroup>
+      <_PublishProperties>Configuration=$(Configuration);RuntimeIdentifier=win-$(InstallerPlatform);SelfContained=true;PublishReadyToRun=true;DebugType=None;DebugSymbols=false;PublishDir=$(PublishDir)</_PublishProperties>
+    </PropertyGroup>
+
+    <Message Importance="high" Text="Publicando Widget Manager $(ProductVersion) (win-$(InstallerPlatform), autocontenido)..." />
+    <RemoveDir Directories="$(PublishDir)" />
+    <!-- Restore for this runtime first (separate evaluation), then publish. -->
+    <MSBuild Projects="$(AppProject)" Targets="Restore" Properties="$(_PublishProperties);_RestoreSession=$([System.Guid]::NewGuid())" />
+    <MSBuild Projects="$(AppProject)" Targets="Publish" Properties="$(_PublishProperties)" />
+  </Target>
+
+  <!-- 3. Hand the published folder and the version to Package.wxs. -->
+  <Target Name="SetInstallerVariables" BeforeTargets="BeforeBuild" DependsOnTargets="ReadAppVersion;PublishApp">
+    <PropertyGroup>
+      <DefineConstants>$(DefineConstants);PublishDir=$(PublishDir);ProductVersion=$(ProductVersion);Manufacturer=$(Manufacturer)</DefineConstants>
+    </PropertyGroup>
+  </Target>
+
+  <!-- 4. Copy the MSI to artifacts\ with the version in its name. -->
+  <Target Name="CopyMsiToArtifacts" AfterTargets="Build">
+    <PropertyGroup>
+      <_FinalMsi>$(MSBuildThisFileDirectory)..\artifacts\WidgetManager-$(ProductVersion)-$(InstallerPlatform).msi</_FinalMsi>
+    </PropertyGroup>
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(_FinalMsi)" />
+    <Message Importance="high" Text="Instalador: $([System.IO.Path]::GetFullPath('$(_FinalMsi)'))" />
+  </Target>
+</Project>

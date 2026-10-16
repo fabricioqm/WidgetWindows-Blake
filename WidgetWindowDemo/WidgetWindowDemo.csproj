@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+
+		<!-- Version shown in Windows and used by the MSI installer: raise it for every release so the
+		     installer upgrades the previous version instead of installing beside it. -->
+		<Version>1.1.0</Version>
+		<Product>Widget Manager</Product>
+		<AssemblyTitle>Widget Manager</AssemblyTitle>
+		<Company>fabricioqm</Company>
+		<Description>Widgets multimedia (imágenes, GIF y vídeos) para el escritorio de Windows.</Description>
+		<Copyright>© fabricioqm</Copyright>
+		<!-- Declares Windows 8+ support: required for layered (transparent) child windows embedded in the desktop. -->
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<!-- WFO0003 suggests WinForms' SetHighDpiMode. This is a WPF app (WinForms only hosts the tray icon), and for
+		     WPF the manifest is the supported place to declare per-monitor DPI awareness. -->
+		<NoWarn>$(NoWarn);WFO0003</NoWarn>
+		<ApplicationIcon>Assets\favicon.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Assets\favicon.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\favicon.ico">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+</Project>

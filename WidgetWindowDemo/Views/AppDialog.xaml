@@ -1,0 +1,69 @@
+<Window x:Class="WidgetWindowDemo.Views.AppDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        SizeToContent="Height"
+        Width="460"
+        FontFamily="Segoe UI"
+        Foreground="{StaticResource TextBrush}"
+        WindowStartupLocation="CenterOwner">
+
+    <!-- Margin leaves room for the shadow around the card. -->
+    <Border Margin="18" CornerRadius="14" Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderStrongBrush}" BorderThickness="1"
+            MouseLeftButtonDown="Card_MouseLeftButtonDown">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.55" Color="Black" />
+        </Border.Effect>
+
+        <Grid Margin="24,22,24,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Icon -->
+            <Border x:Name="IconBadge" Width="42" Height="42" CornerRadius="21" VerticalAlignment="Top" Margin="0,0,16,0">
+                <TextBlock x:Name="IconGlyph" Style="{StaticResource Glyph}" FontSize="19" HorizontalAlignment="Center" />
+            </Border>
+
+            <!-- Title + message -->
+            <StackPanel Grid.Column="1">
+                <TextBlock x:Name="TitleText" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,2,0,0" />
+                <TextBlock x:Name="MessageText" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}"
+                           TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="19" />
+            </StackPanel>
+
+            <!-- Optional details (e.g. one line per rejected file) -->
+            <Border x:Name="DetailsBox" Grid.Row="1" Grid.Column="1" Margin="0,14,0,0" Padding="12,10"
+                    CornerRadius="8" Background="{StaticResource WindowBrush}" Visibility="Collapsed">
+                <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="DetailsList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontSize="12" TextWrapping="Wrap" Margin="0,2"
+                                           Foreground="{StaticResource TextSecondaryBrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,22,0,0">
+                <Button x:Name="SecondaryButton" Style="{StaticResource SecondaryButton}" MinWidth="100"
+                        Margin="0,0,10,0" Click="Secondary_Click" />
+                <Button x:Name="PrimaryButton" Style="{StaticResource PrimaryButton}" MinWidth="100" Click="Primary_Click" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

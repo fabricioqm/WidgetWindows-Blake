@@ -1,0 +1,90 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!--
+    UpgradeCode identifies the product across versions: NEVER change it, or new versions will install beside
+    the old one instead of replacing it.
+  -->
+  <Package Name="Widget Manager"
+           Manufacturer="$(var.Manufacturer)"
+           Version="$(var.ProductVersion)"
+           UpgradeCode="87396447-36ac-499e-9fc5-2e58240fc9a0"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <SummaryInformation Description="Widget Manager $(var.ProductVersion)" />
+
+    <!-- Installing a version replaces any older one; installing an older one is refused. -->
+    <MajorUpgrade DowngradeErrorMessage="Ya hay instalada una versión más reciente de Widget Manager." />
+
+    <!-- Everything inside the .msi: a single file to distribute. -->
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- .NET 10 (included) requires Windows 10 or later. -->
+    <Launch Condition="Installed OR VersionNT64 &gt;= 603"
+            Message="Widget Manager requiere Windows 10 u 11 de 64 bits." />
+
+    <Icon Id="AppIcon" SourceFile="..\WidgetWindowDemo\Assets\favicon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    <Property Id="ARPCOMMENTS" Value="Widgets multimedia (imágenes, GIF y vídeos) para el escritorio de Windows." />
+
+    <!-- If the app is running (it lives in the tray), ask it to exit cleanly so it saves its widgets; end it
+         if it doesn't. Without this, an update could not replace files that are in use. -->
+    <util:CloseApplication Id="CloseWidgetManager" Target="WidgetWindowDemo.exe"
+                           EndSessionMessage="yes" RebootPrompt="no" TerminateProcess="1" Timeout="5" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Widget Manager" />
+    </StandardDirectory>
+
+    <Feature Id="Main" Title="Widget Manager" Level="1">
+      <!-- The executable is declared on its own so shortcuts and "open after install" can point at it. -->
+      <Component Id="AppExe" Directory="INSTALLFOLDER">
+        <File Id="AppExe" Source="$(var.PublishDir)WidgetWindowDemo.exe" KeyPath="yes" />
+      </Component>
+
+      <!-- Everything else from the self-contained publish: the app, the .NET 10 runtime and WPF. -->
+      <Files Directory="INSTALLFOLDER" Include="$(var.PublishDir)**">
+        <Exclude Files="$(var.PublishDir)WidgetWindowDemo.exe" />
+        <Exclude Files="$(var.PublishDir)**\*.pdb" />
+      </Files>
+
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+
+    </Feature>
+
+    <!-- Shortcuts for all users (per-machine install), each with an HKCU key path as Windows Installer validation requires. -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Id="StartMenuShortcut" Name="Widget Manager" Description="Widgets multimedia para el escritorio"
+                  Target="[INSTALLFOLDER]WidgetWindowDemo.exe" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Widget Manager" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcut">
+        <Shortcut Id="DesktopShortcut" Name="Widget Manager" Description="Widgets multimedia para el escritorio"
+                  Target="[INSTALLFOLDER]WidgetWindowDemo.exe" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Widget Manager" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+
+    <!-- Wizard: welcome, install folder, progress, finish (no license page). -->
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <UI>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" Order="2" />
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApp"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
+    </UI>
+
+    <!-- "Open Widget Manager" checkbox on the last page (checked). -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Abrir Widget Manager" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WixShellExecTarget" Value="[#AppExe]" />
+    <CustomAction Id="LaunchApp" BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)" DllEntry="WixShellExec" Impersonate="yes" />
+  </Package>
+</Wix>
