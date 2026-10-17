@@ -686,11 +686,16 @@ namespace WidgetWindowDemo
                 widget.Hidden = hidden;
         }
 
-        private void ShowMainWindow()
+        internal void ShowMainWindow()
         {
             Show();
-            WindowState = WindowState.Normal;
+            if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
             Activate();
+
+            // Activate() alone can leave the window behind others when the request comes from another process.
+            Topmost = true;
+            Topmost = false;
+            NativeMethods.SetForegroundWindow(new WindowInteropHelper(this).Handle);
         }
 
         private void ExitApplication()

@@ -46,6 +46,10 @@ Elige una de estas tres formas; todas producen lo mismo en `artifacts\`.
 .\build-installer.ps1 -Platforms x64,arm64 # también para equipos ARM
 ```
 
+> Si `.\build-installer.ps1` falla con «la ejecución de scripts está deshabilitada en este sistema», usa
+> **`.\build-installer.cmd`** (mismos parámetros, o doble clic en el Explorador): lanza el script sin depender de esa
+> restricción. Alternativa permanente: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
 **b) Un solo comando**
 
 ```powershell

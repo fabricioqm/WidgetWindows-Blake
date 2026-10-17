@@ -10,7 +10,7 @@
 
 		<!-- Version shown in Windows and used by the MSI installer: raise it for every release so the
 		     installer upgrades the previous version instead of installing beside it. -->
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<Product>Widget Manager</Product>
 		<AssemblyTitle>Widget Manager</AssemblyTitle>
 		<Company>fabricioqm</Company>

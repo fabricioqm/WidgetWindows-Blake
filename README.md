@@ -36,7 +36,10 @@ Requiere el [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0).
 git clone https://github.com/fabricioqm/WidgetWindows-Blake.git
 cd WidgetWindows-Blake
 dotnet run --project WidgetWindowDemo\WidgetWindowDemo.csproj   # ejecutar
-.\build-installer.ps1                                           # generar MSI + ZIP en artifacts\
+.\build-installer.cmd                                           # generar MSI + ZIP en artifacts\
 ```
+
+También puedes hacer **doble clic en `build-installer.cmd`**. Funciona aunque Windows tenga bloqueados los scripts de
+PowerShell («la ejecución de scripts está deshabilitada en este sistema»).
 
 Guía completa: [COMPILAR.md](COMPILAR.md).

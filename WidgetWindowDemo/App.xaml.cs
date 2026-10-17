@@ -14,14 +14,18 @@ namespace WidgetWindowDemo
 
             if (!_ownsMutex)
             {
-                // Another instance is already running.
+                // Another instance is already running: ask it to show its window, then quit.
                 _mutex.Dispose();
                 _mutex = null;
+                NativeMethods.AllowSetForegroundWindow(NativeMethods.ASFW_ANY);
+                if (EventWaitHandle.TryOpenExisting(ShowEventName, out var showEvent))
+                    using (showEvent) showEvent.Set();
                 Shutdown();
                 return;
             }
 
             AppLog.Start();
+            ListenForShowRequests();
 
             // Errors raised inside WPF events (e.g. a damaged GIF decoded when an Image loads) must not
             // close the app and take every desktop widget with it.
@@ -44,6 +48,20 @@ namespace WidgetWindowDemo
             };
 
             base.OnStartup(e);
+        }
+
+        private const string ShowEventName = "WidgetWindowDemoShowMainWindow";
+
+        // Signalled by a second launch (e.g. the shortcut clicked while the app sits in the tray).
+        private void ListenForShowRequests()
+        {
+            var showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName);
+            var thread = new Thread(() =>
+            {
+                while (showEvent.WaitOne())
+                    Dispatcher.BeginInvoke(() => (MainWindow as MainWindow)?.ShowMainWindow());
+            }) { IsBackground = true, Name = "ShowRequests" };
+            thread.Start();
         }
 
         protected override void OnExit(ExitEventArgs e)

@@ -5,8 +5,6 @@ VisualStudioVersion = 18.10.12224.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WidgetWindowDemo", "WidgetWindowDemo\WidgetWindowDemo.csproj", "{7B363E46-0746-42A6-91F3-A2B47CE46021}"
 EndProject
-Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "WidgetManager.Installer", "Installer\WidgetManager.Installer.wixproj", "{CD9F4E22-5F79-41DD-841C-E569CE51F713}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,9 +15,6 @@ Global
 		{7B363E46-0746-42A6-91F3-A2B47CE46021}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B363E46-0746-42A6-91F3-A2B47CE46021}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B363E46-0746-42A6-91F3-A2B47CE46021}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD9F4E22-5F79-41DD-841C-E569CE51F713}.Debug|Any CPU.ActiveCfg = Release|x64
-		{CD9F4E22-5F79-41DD-841C-E569CE51F713}.Release|Any CPU.ActiveCfg = Release|x64
-		{CD9F4E22-5F79-41DD-841C-E569CE51F713}.Release|Any CPU.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
